@@ -93,6 +93,7 @@ export function CreateCampaignModal({ isOpen, onClose, onSubmit }: CreateCampaig
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     const newErrors = validate(form);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

@@ -34,8 +34,20 @@ function TeachMemoryModalDialog({
   const [warningMessage, setWarningMessage] = React.useState<string | null>(null);
   const [savedMemory, setSavedMemory] = React.useState<{ id: string; content: string; category: string } | null>(null);
 
+  // Close modal on Escape key press
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isLoading) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, isLoading]);
+
   const handleProceedToPreview = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     if (!content.trim() || content.trim().length < 5) {
       setErrorMessage("Memory content must be at least 5 characters.");
       return;
@@ -45,6 +57,7 @@ function TeachMemoryModalDialog({
   };
 
   const handleConfirmSave = async () => {
+    if (isLoading) return; // Prevent double submission
     setIsLoading(true);
     setErrorMessage(null);
     setWarningMessage(null);

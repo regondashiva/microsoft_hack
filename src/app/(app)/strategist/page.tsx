@@ -16,7 +16,15 @@ export default function StrategistPage() {
         description="Turn Northstar's brand memory into practical content decisions."
       />
 
-      <StrategistWorkspace />
+      <React.Suspense
+        fallback={
+          <div className="py-16 text-center text-sm text-[var(--text-muted)]">
+            Loading strategist workspace...
+          </div>
+        }
+      >
+        <StrategistWorkspace />
+      </React.Suspense>
     </div>
   );
 }

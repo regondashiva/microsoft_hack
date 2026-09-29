@@ -76,11 +76,20 @@ export default function CampaignDetailPage() {
           title={campaign.name}
           description={campaign.summary}
           actions={
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="font-mono text-xs uppercase px-2.5 py-1 rounded bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)]">
                 {campaign.channel === "linkedin" ? "LinkedIn" : "Instagram"}
               </span>
               <StatusPill status={campaign.status} />
+              <Link
+                href={`/strategist?q=${encodeURIComponent(
+                  `What can we learn or build upon from the ${campaign.name} campaign?`
+                )}`}
+              >
+                <Button size="sm" variant="outline" className="text-xs">
+                  Ask Strategist About This Campaign →
+                </Button>
+              </Link>
             </div>
           }
         />

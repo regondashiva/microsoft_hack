@@ -24,12 +24,6 @@ export const siteConfig = {
       iconName: "LayoutDashboard",
     },
     {
-      title: "Strategist",
-      href: "/strategist",
-      description: "Strategy formulation and content planning workspace",
-      iconName: "Sparkles",
-    },
-    {
       title: "Campaigns",
       href: "/campaigns",
       description: "Archive and status of past, active, and upcoming campaigns",
@@ -46,6 +40,12 @@ export const siteConfig = {
       href: "/memory",
       description: "Long-term brand memory and persistent knowledge base",
       iconName: "BrainCircuit",
+    },
+    {
+      title: "Strategist",
+      href: "/strategist",
+      description: "Strategy formulation and content planning workspace",
+      iconName: "Sparkles",
     },
   ] as NavItem[],
 

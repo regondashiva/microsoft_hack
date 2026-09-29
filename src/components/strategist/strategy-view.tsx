@@ -1,7 +1,8 @@
 import * as React from "react";
+import Link from "next/link";
 import { StrategyResponse } from "@/lib/strategist/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Compass, Lightbulb, ShieldAlert, Database, CheckCircle2 } from "lucide-react";
+import { Compass, Lightbulb, ShieldAlert, Database, CheckCircle2, BarChart2, Info } from "lucide-react";
 import { RecommendationFeedback } from "./recommendation-feedback";
 
 interface StrategyViewProps {
@@ -10,6 +11,14 @@ interface StrategyViewProps {
 }
 
 export function StrategyView({ strategy, query }: StrategyViewProps) {
+  // Check if any campaign memories were utilized
+  const campaignMemories = strategy.memoryUsed.filter((mem) =>
+    mem.toUpperCase().includes("CAMPAIGN")
+  );
+  const nonCampaignMemories = strategy.memoryUsed.filter(
+    (mem) => !mem.toUpperCase().includes("CAMPAIGN")
+  );
+
   return (
     <div className="space-y-6">
       {/* Overview / Summary Card */}
@@ -85,10 +94,49 @@ export function StrategyView({ strategy, query }: StrategyViewProps) {
         </CardContent>
       </Card>
 
+      {/* Relevant Campaign Context (Rendered only when campaign memory is relevant) */}
+      {campaignMemories.length > 0 && (
+        <Card className="border-[var(--border)] bg-[var(--surface)]">
+          <CardHeader className="pb-3 border-none">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-[var(--text-primary)]">
+                <BarChart2 className="h-4 w-4 text-[var(--accent)]" />
+                <CardTitle className="text-base">Relevant Campaign Context</CardTitle>
+              </div>
+              <Link
+                href="/campaigns"
+                className="text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 font-medium"
+              >
+                Inspect Campaign Records →
+              </Link>
+            </div>
+            <div className="flex items-start gap-2 mt-1 text-xs text-[var(--text-muted)] bg-[var(--surface-subtle)] p-2.5 rounded border border-[var(--border)]">
+              <Info className="h-3.5 w-3.5 text-[var(--status-info)] shrink-0 mt-0.5" />
+              <span>
+                Performance shown here is from synthetic demonstration data. Northstar uses historical benchmarks to guide format and messaging choices without inventing real-world metrics.
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-wrap gap-2">
+              {campaignMemories.map((mem) => (
+                <span
+                  key={mem}
+                  className="inline-flex items-center text-xs px-2.5 py-1 rounded-md border border-[var(--accent)]/30 bg-[var(--accent)]/5 text-[var(--accent)] font-mono"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] mr-1.5 shrink-0" />
+                  {mem}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Strategic Recommendation Feedback & Controlled Teaching Loop */}
       <RecommendationFeedback query={query} summary={strategy.summary} />
 
-      {/* Memory Grounding Badges */}
+      {/* Verified Memory Context Used */}
       {strategy.memoryUsed.length > 0 && (
         <Card className="border-[var(--border)] bg-[var(--surface)]">
           <CardHeader className="pb-3 border-none">
@@ -102,7 +150,7 @@ export function StrategyView({ strategy, query }: StrategyViewProps) {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="flex flex-wrap gap-2">
-              {strategy.memoryUsed.map((mem) => (
+              {(nonCampaignMemories.length > 0 ? nonCampaignMemories : strategy.memoryUsed).map((mem) => (
                 <span
                   key={mem}
                   className="inline-flex items-center text-xs px-2.5 py-1 rounded-md border border-[var(--border)] bg-[var(--surface-subtle)] text-[var(--text-secondary)] font-mono"
