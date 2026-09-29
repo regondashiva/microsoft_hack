@@ -7,15 +7,20 @@ if (typeof window !== "undefined") {
   throw new Error("CRITICAL SECURITY ERROR: Hindsight configuration must only be accessed server-side.");
 }
 
+function cleanEnv(val: string | undefined): string {
+  if (!val) return "";
+  return val.trim().replace(/^["']|["']$/g, "").trim();
+}
+
 export const HINDSIGHT_CONFIG = {
   get baseUrl() {
-    return (process.env.HINDSIGHT_BASE_URL || "https://api.hindsight.vectorize.io").trim();
+    return cleanEnv(process.env.HINDSIGHT_BASE_URL) || "https://api.hindsight.vectorize.io";
   },
   get apiKey() {
-    return (process.env.HINDSIGHT_API_KEY || "").trim();
+    return cleanEnv(process.env.HINDSIGHT_API_KEY);
   },
   get bankId() {
-    return (process.env.HINDSIGHT_BANK_ID || "northstar-content-strategist").trim();
+    return cleanEnv(process.env.HINDSIGHT_BANK_ID) || "northstar-content-strategist";
   },
   bankName: "Northstar Content Strategist",
   bankMission:

@@ -77,7 +77,7 @@ export function normalizeAIError(error: unknown): AIServiceError {
   console.error("[AIService] Request failed:", rawMessage);
 
   return new AIServiceError(
-    "Failed to complete AI request.",
+    rawMessage || "Failed to complete AI request.",
     "AI_REQUEST_FAILED",
     500
   );
