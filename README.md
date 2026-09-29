@@ -1,7 +1,7 @@
 # MemoryAI — AI Content Strategist
 
-> **Current Status: Task 8 — Production UI & Complete User Workflows (COMPLETE)**  
-> *Coherent product experience, unified navigation shell, responsive layout, accessible modal/drawer interactions, honest loading/empty/error states, and end-to-end strategic workflows.*
+> **Current Status: Task 9 — Explainable Memory-Driven Recommendations / WOW Demo (COMPLETE)**  
+> *Factual explainability layer, visual evidence flow chain, authentic memory provenance, deterministic campaign evidence, and transparent strategic reasoning.*
 
 ---
 
@@ -261,7 +261,61 @@ Task 8 delivers product completeness, unifying all intelligence layers into a co
 
 ---
 
-## 9. Example Strategist Queries
+## 9. Task 9: Explainable Memory-Driven Recommendations & WOW Demo
+
+Task 9 delivers transparency and visible intelligence, proving that MemoryAI is not a generic LLM wrapper by demonstrating how verified memories and campaign benchmarks directly guide every recommendation:
+
+### 1. Architectural Principle: Separation of Facts from Interpretation
+- **Application Controls Facts**:
+  - Selected Hindsight memories, text, categories, and verified provenance labels.
+  - Selected campaign records, deterministic calculations (reach, engagement rate, CTR), and synthetic disclosures.
+  - Accurate evidence counts (e.g. `4 verified memories · 2 relevant campaigns`).
+- **LLM Provides Strategic Reasoning**:
+  - Connecting brand guidelines with campaign format observations.
+  - Articulating why a given strategy fits Northstar Brand Co.
+
+### 2. Explainability Layer Components
+- **Visual Evidence Flow Chain**:
+  $$\text{[ Persistent Memory ]} \longrightarrow \text{[ Campaign Evidence ]} \longrightarrow \text{[ Strategic Reasoning ]} \longrightarrow \text{[ Actionable Recommendation ]}$$
+  Implemented using restrained dark SaaS surfaces, subtle borders, and clear step hierarchy (no futuristic neon or animated AI brains).
+- **Supporting Memory Cards**:
+  Displays verified knowledge with true provenance badges:
+  - `Source: User Taught` (green)
+  - `Source: User Feedback` (sky blue)
+  - `Source: Campaign History` (amber)
+  - `Source: Seeded Brand Knowledge` (violet)
+  Includes citation labels (e.g. `[AUDIENCE: young-professionals-workflow]`) and direct links to inspect the memory bank.
+- **Relevant Campaign Evidence Cards**:
+  Displays objective, format, key takeaway, impressions, reach, engagement rate, and CTR alongside the mandatory synthetic demonstration disclosure.
+- **Honest Missing-Evidence Handling**:
+  If a query does not select campaign records (e.g. tone/voice queries), the system honestly reports:
+  > *"Brand voice and tone queries rely directly on core brand memory; campaign metrics were intentionally not selected."*
+  Zero hallucinated or manufactured evidence.
+
+### 3. Complete WOW Cognitive Loop
+```
+Northstar Teaches Preference
+            ↓
+Hindsight Cloud Retains & Indexes
+            ↓
+User Queries Strategist
+            ↓
+Query-Aware Retrieval Recalls Memory
+            ↓
+Campaign Layer Selects Relevant Historical Data
+            ↓
+LLM Formulates Grounded Recommendations
+            ↓
+Explainability Layer Exposes Full Provenance & Evidence Chain
+            ↓
+User Provides Feedback / Teaches Strategic Correction
+            ↓
+Northstar Learns for Future Formulations
+```
+
+---
+
+## 10. Example Strategist Queries
 
 Use the interactive Strategist workspace (`/strategist`) to query:
 - *"What should Northstar post next?"*
@@ -273,7 +327,7 @@ Use the interactive Strategist workspace (`/strategist`) to query:
 
 ---
 
-## 10. Verification & QA Commands
+## 11. Verification & QA Commands
 
 ```bash
 # 1. Strict TypeScript Check

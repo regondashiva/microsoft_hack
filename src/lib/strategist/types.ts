@@ -100,6 +100,8 @@ export const strategyRecommendationSchema = z.object({
   description: z.string().min(1, "Recommendation description is required"),
 });
 
+import { strategyExplanationSchema, StrategyExplanation } from "./explainability/types";
+
 export const strategyResponseSchema = z.object({
   summary: z.string().min(1, "Strategy summary is required"),
   recommendations: z
@@ -109,10 +111,12 @@ export const strategyResponseSchema = z.object({
   reasoning: z.string().min(1, "Strategic reasoning is required"),
   memoryUsed: z.array(z.string()).default([]),
   caveats: z.array(z.string()).default([]),
+  explanation: strategyExplanationSchema.optional(),
 });
 
 export type StrategyRecommendation = z.infer<typeof strategyRecommendationSchema>;
 export type StrategyResponse = z.infer<typeof strategyResponseSchema>;
+export type { StrategyExplanation };
 
 export interface StrategistApiRequest {
   query: string;

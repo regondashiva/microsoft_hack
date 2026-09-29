@@ -12,6 +12,7 @@ import {
 import { retrieveMemoriesForQuery } from "./retrieval";
 import { buildMemoryContext } from "./context";
 import { selectRelevantCampaignContext } from "../campaigns/selection";
+import { buildStrategyExplanation } from "./explainability";
 
 /**
  * Strips markdown code blocks if the model wrapped its response in ```json ... ```.
@@ -156,23 +157,40 @@ export async function formulateStrategy(query: string): Promise<FormulateStrateg
 
   // 4. Handle empty memory (Insufficient context)
   if (retrievedMemories.length === 0 || candidateMemories.length === 0) {
+    const fallbackRecs = [
+      {
+        title: "Provide Relevant Brand Context",
+        description:
+          "The persistent memory bank returned no relevant knowledge records for this query. The strategist requires verified Northstar brand context before formulating recommendations.",
+      },
+    ];
+    const fallbackReasoning =
+      "To prevent generic marketing filler or ungrounded claims, the AI Content Strategist operates exclusively over verified brand memory.";
+    const fallbackSummary =
+      "Not enough Northstar context is available to make a grounded recommendation.";
+
+    const explanation = buildStrategyExplanation({
+      query: trimmedQuery,
+      summary: fallbackSummary,
+      recommendations: fallbackRecs,
+      reasoning: fallbackReasoning,
+      memoryUsed: [],
+      selectedMemories: [],
+      selectedCampaigns: [],
+      queryIntent,
+    });
+
     return {
       success: true,
       strategy: {
-        summary: "Not enough Northstar context is available to make a grounded recommendation.",
-        recommendations: [
-          {
-            title: "Provide Relevant Brand Context",
-            description:
-              "The persistent memory bank returned no relevant knowledge records for this query. The strategist requires verified Northstar brand context before formulating recommendations.",
-          },
-        ],
-        reasoning:
-          "To prevent generic marketing filler or ungrounded claims, the AI Content Strategist operates exclusively over verified brand memory.",
+        summary: fallbackSummary,
+        recommendations: fallbackRecs,
+        reasoning: fallbackReasoning,
         memoryUsed: [],
         caveats: [
           "Ensure your query relates to Northstar's brand identity, target audience (young professionals), content preferences, or campaign history.",
         ],
+        explanation,
       },
       retrievedMemoryCount: retrievedMemories.length,
       selectedMemoryCount: 0,
@@ -262,11 +280,26 @@ export async function formulateStrategy(query: string): Promise<FormulateStrateg
     // Ensure memoryUsed references strictly selected memory context
     const finalMemoryUsed = deriveMemoryCitations(selectedMemories, validated.memoryUsed);
 
+    // Construct deterministic explainability data connecting memory, campaign evidence, and recommendations
+    const explanation = buildStrategyExplanation({
+      query: trimmedQuery,
+      summary: validated.summary,
+      recommendations: validated.recommendations,
+      reasoning: validated.reasoning,
+      memoryUsed: finalMemoryUsed,
+      selectedMemories,
+      selectedCampaigns: campaignContextResult.hasContext
+        ? campaignContextResult.selectedCampaigns
+        : [],
+      queryIntent,
+    });
+
     return {
       success: true,
       strategy: {
         ...validated,
         memoryUsed: finalMemoryUsed,
+        explanation,
       },
       retrievedMemoryCount: retrievedMemories.length,
       selectedMemoryCount: selectedMemories.length,
