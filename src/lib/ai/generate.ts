@@ -61,35 +61,24 @@ export async function generateText(options: GenerateTextOptions): Promise<Genera
 
   // 4. Invoke LLM provider via direct HTTP fetch
   try {
-    console.log(`[AIService] POST ${endpoint} (model: ${config.model})`);
+    const modelsToTry = [
+      config.model,
+      "google/gemini-2.0-flash-exp:free",
+      "meta-llama/llama-3.2-3b-instruct:free",
+      "meta-llama/llama-3.1-8b-instruct:free",
+      "mistralai/mistral-7b-instruct:free",
+      "qwen/qwen-2.5-72b-instruct:free",
+      "openai/gpt-4o-mini",
+    ].filter((m, i, arr): m is string => Boolean(m) && arr.indexOf(m) === i);
 
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${credentials.apiKey}`,
-        "HTTP-Referer": "https://microsofthack.vercel.app",
-        "X-Title": "MemoryAI Content Strategist",
-      },
-      body: JSON.stringify({
-        model: config.model || "openai/gpt-4o-mini",
-        messages,
-        temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
-        max_tokens: options.maxTokens,
-      }),
-      signal: controller.signal,
-    });
+    let lastErrorStatus = 500;
+    let lastErrorText = "";
 
-    clearTimeout(timeoutId);
+    for (const modelToAttempt of modelsToTry) {
+      try {
+        console.log(`[AIService] POST ${endpoint} (attempting model: ${modelToAttempt})`);
 
-    if (!res.ok) {
-      const errorBody = await res.text();
-      console.error(`[AIService] Upstream HTTP ${res.status}:`, errorBody);
-
-      // Automatic fallback to openai/gpt-4o-mini on OpenRouter if custom model slug failed
-      if (res.status === 404 && config.model !== "openai/gpt-4o-mini") {
-        console.warn(`[AIService] Model "${config.model}" returned 404. Falling back to "openai/gpt-4o-mini"...`);
-        const fallbackRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -98,56 +87,59 @@ export async function generateText(options: GenerateTextOptions): Promise<Genera
             "X-Title": "MemoryAI Content Strategist",
           },
           body: JSON.stringify({
-            model: "openai/gpt-4o-mini",
+            model: modelToAttempt,
             messages,
             temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
             max_tokens: options.maxTokens,
           }),
+          signal: controller.signal,
         });
 
-        if (fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          const generatedText = fallbackData.choices?.[0]?.message?.content || "";
-          return {
-            text: generatedText,
-            model: fallbackData.model || "openai/gpt-4o-mini",
-            usage: fallbackData.usage
-              ? {
-                  inputTokens: fallbackData.usage.prompt_tokens,
-                  outputTokens: fallbackData.usage.completion_tokens,
-                  totalTokens: fallbackData.usage.total_tokens,
-                }
-              : undefined,
-          };
-        }
-      }
+        if (res.ok) {
+          clearTimeout(timeoutId);
+          const data = await res.json();
+          const generatedText = data.choices?.[0]?.message?.content || "";
+          const resolvedModel = data.model || modelToAttempt;
 
-      throw new AIServiceError(
-        `AI provider returned error (${res.status}): ${res.statusText}`,
-        res.status === 401 || res.status === 403
-          ? "AI_CONFIGURATION_ERROR"
-          : res.status === 429
-          ? "AI_RATE_LIMITED"
-          : "AI_REQUEST_FAILED",
-        res.status
-      );
+          if (generatedText && generatedText.trim().length > 0) {
+            return {
+              text: generatedText,
+              model: resolvedModel,
+              usage: data.usage
+                ? {
+                    inputTokens: data.usage.prompt_tokens,
+                    outputTokens: data.usage.completion_tokens,
+                    totalTokens: data.usage.total_tokens,
+                  }
+                : undefined,
+            };
+          }
+        } else {
+          lastErrorStatus = res.status;
+          lastErrorText = await res.text();
+          console.warn(`[AIService] Model ${modelToAttempt} failed with status ${res.status}:`, lastErrorText.slice(0, 150));
+          // Continue to try next fallback model in the list
+          continue;
+        }
+      } catch (attemptErr: unknown) {
+        if (attemptErr instanceof Error && attemptErr.name === "AbortError") {
+          throw new AIServiceError("AI request timed out.", "AI_TIMEOUT_ERROR", 408);
+        }
+        console.warn(`[AIService] Attempt with ${modelToAttempt} threw:`, attemptErr);
+        continue;
+      }
     }
 
-    const data = await res.json();
-    const generatedText = data.choices?.[0]?.message?.content || "";
-    const resolvedModel = data.model || config.model;
-
-    return {
-      text: generatedText,
-      model: resolvedModel,
-      usage: data.usage
-        ? {
-            inputTokens: data.usage.prompt_tokens,
-            outputTokens: data.usage.completion_tokens,
-            totalTokens: data.usage.total_tokens,
-          }
-        : undefined,
-    };
+    clearTimeout(timeoutId);
+    throw new AIServiceError(
+      `AI provider returned error (${lastErrorStatus}): ${lastErrorText || "Upstream request failed"}`,
+      lastErrorStatus === 401 || lastErrorStatus === 403
+        ? "AI_CONFIGURATION_ERROR"
+        : lastErrorStatus === 429
+        ? "AI_RATE_LIMITED"
+        : "AI_REQUEST_FAILED",
+      lastErrorStatus
+    );
   } catch (error) {
     clearTimeout(timeoutId);
     throw normalizeAIError(error);
