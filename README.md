@@ -1,7 +1,21 @@
 # MemoryAI — AI Content Strategist
 
-> **Current Status: Task 10 — Production Hardening, Security, Testing & Deployment Readiness (COMPLETE)**  
-> *Production-hardened Next.js application, server-only secret isolation, strict API input validation & size bounding, prompt injection & financial hallucination safeguards, security headers, 74/74 automated tests passing, zero-vulnerability audit, and comprehensive deployment readiness.*
+> **Live Deployment:** [https://microsofthack.vercel.app](https://microsofthack.vercel.app)  
+> **Repository:** [https://github.com/regondashiva/microsoft_hack](https://github.com/regondashiva/microsoft_hack)  
+> **Status:** Production-Ready & Deployed | 74/74 Automated Tests Passing  
+> **Deliverables:** Presentation Deck ([`microsoft_hack.pptx`](microsoft_hack.pptx)) & Submission Document ([`MemoryAI_Final_Project_Submission_Document_.docx`](MemoryAI_Final_Project_Submission_Document_.docx))
+
+---
+
+## Quick Links
+
+- 🌐 **Live Application**: [https://microsofthack.vercel.app](https://microsofthack.vercel.app)
+- 🎯 **AI Content Strategist**: [https://microsofthack.vercel.app/strategist](https://microsofthack.vercel.app/strategist)
+- 🧠 **Memory Bank Explorer**: [https://microsofthack.vercel.app/memory](https://microsofthack.vercel.app/memory)
+- 📊 **Campaign Intelligence**: [https://microsofthack.vercel.app/campaigns](https://microsofthack.vercel.app/campaigns)
+- 👥 **Audience Segments**: [https://microsofthack.vercel.app/audience](https://microsofthack.vercel.app/audience)
+- 📑 **Final Submission Document**: [`MemoryAI_Final_Project_Submission_Document_.docx`](MemoryAI_Final_Project_Submission_Document_.docx)
+- 📊 **Pitch Deck**: [`microsoft_hack.pptx`](microsoft_hack.pptx)
 
 ---
 
