@@ -40,12 +40,23 @@ function normalizeBaseUrl(raw: string | undefined): string | undefined {
  */
 export function getAIConfig(): AIConfig {
   const apiKey = cleanEnv(process.env.LLM_API_KEY || process.env.OPENAI_API_KEY);
-  const provider = (cleanEnv(process.env.LLM_PROVIDER) as AIProvider) || "openai-compatible";
-  let model = cleanEnv(process.env.LLM_MODEL || process.env.DEFAULT_MODEL);
-  const baseUrl = normalizeBaseUrl(process.env.LLM_BASE_URL);
+  const isOpenRouter = apiKey.startsWith("sk-or-v1-");
+  const provider = (cleanEnv(process.env.LLM_PROVIDER) as AIProvider) || (isOpenRouter ? "openai-compatible" : "openai");
+  
+  let baseUrl = normalizeBaseUrl(process.env.LLM_BASE_URL);
+  if (isOpenRouter && (!baseUrl || !baseUrl.includes("openrouter.ai"))) {
+    baseUrl = "https://openrouter.ai/api/v1";
+  }
 
-  if (!model) {
-    model = baseUrl && baseUrl.includes("openrouter.ai") ? "openai/gpt-4o-mini" : DEFAULT_MODEL;
+  let model = cleanEnv(process.env.LLM_MODEL || process.env.DEFAULT_MODEL);
+  if (isOpenRouter) {
+    if (!model || model === "gpt-4o-mini") {
+      model = "openai/gpt-4o-mini";
+    }
+  } else {
+    if (!model) {
+      model = DEFAULT_MODEL;
+    }
   }
 
   const rawTimeout = process.env.LLM_TIMEOUT_MS ? parseInt(process.env.LLM_TIMEOUT_MS, 10) : NaN;
@@ -66,7 +77,12 @@ export function getAIConfig(): AIConfig {
  */
 export function getAIServerCredentials(): { apiKey: string; baseUrl?: string } {
   const apiKey = cleanEnv(process.env.LLM_API_KEY || process.env.OPENAI_API_KEY);
-  const baseUrl = normalizeBaseUrl(process.env.LLM_BASE_URL);
+  const isOpenRouter = apiKey.startsWith("sk-or-v1-");
+  let baseUrl = normalizeBaseUrl(process.env.LLM_BASE_URL);
+  
+  if (isOpenRouter && (!baseUrl || !baseUrl.includes("openrouter.ai"))) {
+    baseUrl = "https://openrouter.ai/api/v1";
+  }
 
   return {
     apiKey,
