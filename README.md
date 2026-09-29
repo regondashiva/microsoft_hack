@@ -1,7 +1,7 @@
 # MemoryAI — AI Content Strategist
 
-> **Current Status: Task 5 — Hindsight Memory Retrieval & Contextual Reasoning (COMPLETE)**  
-> *The retrieval layer implements query-aware analysis, deterministic relevance filtering, deduplication, strategic categorization, and bounded context budgeting before LLM reasoning.*
+> **Current Status: Task 6 — Teach → Remember → Recall → Improve Learning Loop (COMPLETE)**  
+> *Persistent learning loop allowing content strategists to teach preferences and rules, validate and deduplicate them, persist them in Hindsight, and recall them to guide improved future recommendations.*
 
 ---
 
@@ -80,8 +80,8 @@ We are constructing **ONE production-level application incrementally** across di
 | **Task 2** | **Hindsight Memory Layer** | **COMPLETE** | Real Hindsight Cloud integration, server-only client, dedicated memory bank, idempotent seeding, secure Recall/Retain API, interactive Memory Explorer UI. |
 | **Task 3** | **LLM Service Foundation** | **COMPLETE** | Production-quality server-side LLM abstraction, model-agnostic provider configuration, normalized response interface, timeout & error normalization, `/api/ai/status` & `/api/ai/test` endpoints. |
 | **Task 4** | **Core AI Content Strategist Agent** | **COMPLETE** | Brand-grounded strategy formulation engine combining Hindsight memory recall with LLM reasoning, strict Zod output validation, prompt injection defense, and focused workspace UI. |
-| **Task 5** | **Hindsight Retrieval & Contextual Reasoning** | *Next Up* | Advanced multi-source retrieval, multi-hop citations, and constraint enforcement across channels. |
-| **Task 6** | **Teach → Remember → Recall → Improve Loop** | *Scheduled* | Feedback loops where user critiques and performance data update persistent memory nodes. |
+| **Task 5** | **Hindsight Retrieval & Contextual Reasoning** | **COMPLETE** | Query-aware retrieval, deterministic relevance filtering, deduplication, strategic categorization, and bounded context budgeting. |
+| **Task 6** | **Teach → Remember → Recall → Improve Loop** | **COMPLETE** | Controlled persistent learning loop: explicit teaching, secret detection, deduplication, conflict preservation, and future strategy grounding. |
 | **Task 7** | **Realistic Brand, Campaign & Performance Data** | *Scheduled* | Realistic enterprise brand fixtures, multi-channel metrics, and authentic feedback seeds. |
 | **Task 8** | **Production UI & Complete User Workflows** | *Scheduled* | Full interactive strategy canvas, campaign formulation workflows, memory inspection drawer. |
 | **Task 9** | **Explainable Memory Recommendations & WOW Demo**| *Scheduled* | Visual memory recall attribution ("Why this was recommended"), before/after learning proof. |
@@ -180,19 +180,33 @@ Content-Type: application/json
 
 ---
 
-## 7. Example Strategist Queries
+## 7. Task 6: Teach → Remember → Recall → Improve Learning Loop
+
+The learning loop enables users to teach the strategist durable preferences and campaign corrections without blindly storing conversational noise:
+
+$$\text{Teach} \longrightarrow \text{Validate} \longrightarrow \text{Retain} \longrightarrow \text{Recall} \longrightarrow \text{Reason} \longrightarrow \text{Improve}$$
+
+1. **Explicit User Control**: Memories are never saved silently. Users must explicitly click "Teach Northstar" or provide recommendation feedback ("Was this recommendation useful?") and confirm saving.
+2. **Preview Before Persistence**: The UI renders a transparent preview of the record before sending to the server.
+3. **Server-Side Validation**: `POST /api/memory/teach` enforces strict Zod schemas, bounds content length (5–600 chars), validates strategic categories, and scans for credentials/secrets.
+4. **Deduplication & Conflict Detection**: Existing memories are checked before writing to avoid duplicate items. Conflicting preferences are labeled as current strategic guidance while preserving the historical archive.
+5. **Persistent Hindsight Grounding**: Taught memories are retained in the `northstar-content-strategist` bank and recalled dynamically by the Task 5 retrieval layer to guide future LLM recommendations.
+
+---
+
+## 8. Example Strategist Queries
 
 Use the interactive Strategist workspace (`/strategist`) to query:
 - *"What should Northstar post next?"*
 - *"How should we speak to young professionals?"*
 - *"What content themes fit our brand?"*
-- *"How should we approach LinkedIn?"*
+- *"What should Northstar post on LinkedIn?"*
 - *"What should Northstar avoid in its messaging?"*
 - *"What campaigns has Northstar run?"*
 
 ---
 
-## 8. Verification & QA Commands
+## 9. Verification & QA Commands
 
 ```bash
 # 1. Strict TypeScript Check

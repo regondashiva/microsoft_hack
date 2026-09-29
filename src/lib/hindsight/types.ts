@@ -23,6 +23,7 @@ export interface SafeMemoryResult {
   context?: string;
   score?: number;
   metadata?: Record<string, string>;
+  source?: string;
 }
 
 export interface RecallResponsePayload {

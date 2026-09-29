@@ -4,8 +4,9 @@ import * as React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SafeMemoryResult } from "@/lib/hindsight/types";
-import { Search, Sparkles, Database, AlertCircle } from "lucide-react";
+import { Search, Sparkles, Database, AlertCircle, BookmarkPlus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { TeachMemoryModal } from "@/components/strategist/teach-memory-modal";
 
 const SUGGESTED_QUERIES = [
   "What is Northstar's target audience?",
@@ -17,14 +18,16 @@ const SUGGESTED_QUERIES = [
 
 interface MemoryExplorerProps {
   isConnected: boolean;
+  onMemoryTaught?: () => void;
 }
 
-export function MemoryExplorer({ isConnected }: MemoryExplorerProps) {
+export function MemoryExplorer({ isConnected, onMemoryTaught }: MemoryExplorerProps) {
   const [query, setQuery] = React.useState("");
   const [activeQuery, setActiveQuery] = React.useState("");
   const [results, setResults] = React.useState<SafeMemoryResult[] | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isTeachModalOpen, setIsTeachModalOpen] = React.useState(false);
 
   const handleSearch = async (searchQuery: string) => {
     const trimmed = searchQuery.trim();
@@ -67,19 +70,66 @@ export function MemoryExplorer({ isConnected }: MemoryExplorerProps) {
     handleSearch(q);
   };
 
+  const renderSourceBadge = (item: SafeMemoryResult) => {
+    const src = item.source || item.metadata?.source;
+
+    if (src === "user_taught") {
+      return (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          Source: User Taught
+        </span>
+      );
+    }
+    if (src === "user_feedback") {
+      return (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
+          Source: User Feedback
+        </span>
+      );
+    }
+    if (src === "campaign_history") {
+      return (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          Source: Campaign History
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20">
+        Source: Seeded Brand Knowledge
+      </span>
+    );
+  };
+
   return (
     <Card className="border-[var(--border)] bg-[var(--surface)]">
       <CardHeader>
-        <div className="flex items-center gap-2 text-[var(--accent)] mb-1">
-          <Database className="h-4 w-4" />
-          <span className="text-xs font-mono uppercase tracking-wider font-medium">
-            Memory Explorer
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-[var(--accent)] mb-1">
+              <Database className="h-4 w-4" />
+              <span className="text-xs font-mono uppercase tracking-wider font-medium">
+                Memory Explorer
+              </span>
+            </div>
+            <CardTitle className="text-lg sm:text-xl">Search Persistent Brand Knowledge</CardTitle>
+            <CardDescription>
+              Query Northstar&apos;s Hindsight memory bank in natural language to recall verified brand facts, audience preferences, and taught rules.
+            </CardDescription>
+          </div>
+
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsTeachModalOpen(true)}
+            disabled={!isConnected}
+            className="gap-1.5 h-8 text-xs shrink-0 self-start sm:self-auto font-medium"
+          >
+            <BookmarkPlus className="h-3.5 w-3.5 text-[var(--accent)]" />
+            Teach Strategic Memory
+          </Button>
         </div>
-        <CardTitle className="text-lg sm:text-xl">Search Persistent Brand Knowledge</CardTitle>
-        <CardDescription>
-          Query Northstar&apos;s Hindsight memory bank in natural language to recall verified brand facts, audience preferences, and campaign context.
-        </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -189,10 +239,15 @@ export function MemoryExplorer({ isConnected }: MemoryExplorerProps) {
                   key={item.id}
                   className="p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-subtle)]/60 hover:border-[var(--border-strong)] transition-colors"
                 >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20">
-                      Persistent Brand Memory
-                    </span>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      {renderSourceBadge(item)}
+                      {item.category && (
+                        <span className="text-[11px] font-mono uppercase text-[var(--text-muted)]">
+                          [{item.category}]
+                        </span>
+                      )}
+                    </div>
                     {item.context && (
                       <span className="text-xs text-[var(--text-muted)] font-mono">
                         {item.context}
@@ -208,6 +263,15 @@ export function MemoryExplorer({ isConnected }: MemoryExplorerProps) {
           </div>
         )}
       </CardContent>
+
+      <TeachMemoryModal
+        isOpen={isTeachModalOpen}
+        onClose={() => setIsTeachModalOpen(false)}
+        onSuccess={() => {
+          if (onMemoryTaught) onMemoryTaught();
+          if (activeQuery) handleSearch(activeQuery);
+        }}
+      />
     </Card>
   );
 }

@@ -179,6 +179,7 @@ export function normalizeMemory(item: SafeMemoryResult, index: number): Retrieve
     context: item.context,
     score: typeof item.score === "number" && !isNaN(item.score) ? item.score : undefined,
     metadata: item.metadata,
+    source: item.source,
   };
 }
 

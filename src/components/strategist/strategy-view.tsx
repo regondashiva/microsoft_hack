@@ -2,6 +2,7 @@ import * as React from "react";
 import { StrategyResponse } from "@/lib/strategist/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Compass, Lightbulb, ShieldAlert, Database, CheckCircle2 } from "lucide-react";
+import { RecommendationFeedback } from "./recommendation-feedback";
 
 interface StrategyViewProps {
   strategy: StrategyResponse;
@@ -83,6 +84,9 @@ export function StrategyView({ strategy, query }: StrategyViewProps) {
           </p>
         </CardContent>
       </Card>
+
+      {/* Strategic Recommendation Feedback & Controlled Teaching Loop */}
+      <RecommendationFeedback query={query} summary={strategy.summary} />
 
       {/* Memory Grounding Badges */}
       {strategy.memoryUsed.length > 0 && (

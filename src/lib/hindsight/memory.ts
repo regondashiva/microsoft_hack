@@ -234,6 +234,10 @@ export async function recallMemories(query: string): Promise<RecallResponsePaylo
       const rawScore = item.scores?.final ?? item.scores?.reranker;
       const score = typeof rawScore === "number" && !isNaN(rawScore) ? rawScore : undefined;
 
+      const source =
+        item.metadata?.source ||
+        (item.metadata?.seedId ? "seeded" : (item.context?.toLowerCase().includes("campaign") ? "campaign_history" : undefined));
+
       return {
         id: item.id || `mem-${index}`,
         text: item.text,
@@ -242,6 +246,7 @@ export async function recallMemories(query: string): Promise<RecallResponsePaylo
         context: item.context || undefined,
         score,
         metadata: item.metadata || undefined,
+        source,
       };
     });
 

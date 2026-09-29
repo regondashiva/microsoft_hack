@@ -22,6 +22,7 @@ export interface RetrievedMemory {
   context?: string;
   score?: number;
   metadata?: Record<string, string>;
+  source?: string;
 }
 
 /**

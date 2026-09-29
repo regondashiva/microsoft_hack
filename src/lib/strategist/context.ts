@@ -20,6 +20,7 @@ export function categorizeMemory(mem: RetrievedMemory): CategorizedMemory {
   let memoryCategory: MemoryCategory = "STRATEGIC";
 
   if (
+    catKey === "brand" ||
     catKey === "brand_identity" ||
     catKey === "brand_positioning" ||
     catKey === "brand_voice" ||
@@ -30,6 +31,7 @@ export function categorizeMemory(mem: RetrievedMemory): CategorizedMemory {
   ) {
     memoryCategory = "BRAND";
   } else if (
+    catKey === "audience" ||
     catKey === "target_audience" ||
     catKey === "audience_segment" ||
     catKey === "secondary_audience" ||
@@ -38,6 +40,7 @@ export function categorizeMemory(mem: RetrievedMemory): CategorizedMemory {
   ) {
     memoryCategory = "AUDIENCE";
   } else if (
+    catKey === "content" ||
     catKey === "content_preference" ||
     catKey === "content_themes" ||
     contextLower.includes("content") ||
@@ -45,11 +48,14 @@ export function categorizeMemory(mem: RetrievedMemory): CategorizedMemory {
   ) {
     memoryCategory = "CONTENT";
   } else if (
+    catKey === "campaign" ||
     catKey === "campaign_history" ||
     contextLower.includes("campaign") ||
     textLower.includes("campaign called")
   ) {
     memoryCategory = "CAMPAIGN";
+  } else if (catKey === "strategic") {
+    memoryCategory = "STRATEGIC";
   } else {
     // Content-based heuristic fallback
     if (textLower.includes("communication style") || textLower.includes("brand voice")) {

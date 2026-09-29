@@ -132,7 +132,7 @@ export default function MemoryPage() {
 
       {/* Interactive Natural Language Memory Explorer */}
       <section>
-        <MemoryExplorer isConnected={isConnected} />
+        <MemoryExplorer isConnected={isConnected} onMemoryTaught={handleRefresh} />
       </section>
     </div>
   );

@@ -3,8 +3,10 @@
 import * as React from "react";
 import { StrategistForm } from "./strategist-form";
 import { StrategyView } from "./strategy-view";
+import { TeachMemoryModal } from "./teach-memory-modal";
 import { StrategyResponse, StrategistApiResponse } from "@/lib/strategist/types";
-import { AlertCircle, Compass } from "lucide-react";
+import { AlertCircle, Compass, BookmarkPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function StrategistWorkspace() {
   const [query, setQuery] = React.useState("");
@@ -12,6 +14,7 @@ export function StrategistWorkspace() {
   const [strategy, setStrategy] = React.useState<StrategyResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isTeachModalOpen, setIsTeachModalOpen] = React.useState(false);
 
   const handleSubmit = async (searchQuery: string) => {
     const trimmed = searchQuery.trim();
@@ -49,13 +52,30 @@ export function StrategistWorkspace() {
   return (
     <div className="space-y-8">
       {/* Query Formulation Input */}
-      <section>
+      <section className="space-y-3">
         <StrategistForm
           query={query}
           onQueryChange={setQuery}
           onSubmit={handleSubmit}
           isLoading={isLoading}
         />
+
+        {/* Action bar for controlled teaching */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1 text-xs">
+          <span className="text-[var(--text-muted)]">
+            Continuous Learning Loop: Teach Northstar new rules or campaign preferences directly into persistent memory.
+          </span>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsTeachModalOpen(true)}
+            className="gap-1.5 h-7 text-xs self-start sm:self-auto font-medium"
+          >
+            <BookmarkPlus className="h-3.5 w-3.5 text-[var(--accent)]" />
+            Teach Northstar
+          </Button>
+        </div>
       </section>
 
       {/* Loading State */}
@@ -92,6 +112,12 @@ export function StrategistWorkspace() {
           <StrategyView strategy={strategy} query={activeQuery} />
         </section>
       )}
+
+      {/* Explicit Teach Modal with Confirmation Preview */}
+      <TeachMemoryModal
+        isOpen={isTeachModalOpen}
+        onClose={() => setIsTeachModalOpen(false)}
+      />
     </div>
   );
 }
