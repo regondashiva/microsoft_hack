@@ -1,3 +1,5 @@
+export {};
+
 async function runQuery(query: string, label: string) {
   console.log(`\n========================================`);
   console.log(`TEST: ${label}`);

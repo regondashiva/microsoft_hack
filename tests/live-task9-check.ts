@@ -3,6 +3,8 @@
  * Validates the full Explainability and WOW loop against live Hindsight Cloud + OpenRouter.
  */
 
+export {};
+
 async function teachMemory(content: string, category: string, context: string) {
   console.log(`\n========================================`);
   console.log(`STEP A: TEACH NEW MEMORY`);
