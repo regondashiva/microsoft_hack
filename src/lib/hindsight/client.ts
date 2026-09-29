@@ -6,6 +6,8 @@ if (typeof window !== "undefined") {
 }
 
 let clientInstance: HindsightClient | null = null;
+let lastApiKey = "";
+let lastBaseUrl = "";
 
 /**
  * Returns the singleton HindsightClient instance, or null if not configured.
@@ -15,11 +17,16 @@ export function getHindsightClient(): HindsightClient | null {
     return null;
   }
 
-  if (!clientInstance) {
+  const currentApiKey = HINDSIGHT_CONFIG.apiKey;
+  const currentBaseUrl = HINDSIGHT_CONFIG.baseUrl;
+
+  if (!clientInstance || lastApiKey !== currentApiKey || lastBaseUrl !== currentBaseUrl) {
     clientInstance = new HindsightClient({
-      baseUrl: HINDSIGHT_CONFIG.baseUrl,
-      apiKey: HINDSIGHT_CONFIG.apiKey,
+      baseUrl: currentBaseUrl,
+      apiKey: currentApiKey,
     });
+    lastApiKey = currentApiKey;
+    lastBaseUrl = currentBaseUrl;
   }
 
   return clientInstance;

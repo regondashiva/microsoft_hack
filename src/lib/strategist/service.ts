@@ -252,7 +252,7 @@ export async function formulateStrategy(query: string): Promise<FormulateStrateg
     console.error("[Strategist Service] Generation failure:", message);
     return {
       success: false,
-      error: "AI strategy is temporarily unavailable.",
+      error: message || "AI strategy is temporarily unavailable.",
       code: "AI_REQUEST_FAILED",
       retrievedMemoryCount: retrievedMemories.length,
       selectedMemoryCount: selectedMemories.length,

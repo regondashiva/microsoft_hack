@@ -8,17 +8,23 @@ if (typeof window !== "undefined") {
 }
 
 export const HINDSIGHT_CONFIG = {
-  baseUrl: process.env.HINDSIGHT_BASE_URL || "https://api.hindsight.vectorize.io",
-  apiKey: process.env.HINDSIGHT_API_KEY || "",
-  bankId: process.env.HINDSIGHT_BANK_ID || "northstar-content-strategist",
+  get baseUrl() {
+    return (process.env.HINDSIGHT_BASE_URL || "https://api.hindsight.vectorize.io").trim();
+  },
+  get apiKey() {
+    return (process.env.HINDSIGHT_API_KEY || "").trim();
+  },
+  get bankId() {
+    return (process.env.HINDSIGHT_BANK_ID || "northstar-content-strategist").trim();
+  },
   bankName: "Northstar Content Strategist",
   bankMission:
     "This memory bank stores persistent strategic knowledge for Northstar Brand Co.'s AI Content Strategist. It contains brand context, audience preferences, campaign history, content preferences, feedback and strategic insights that can improve future content strategy.",
-} as const;
+};
 
 /**
  * Returns true if the Hindsight API key is present and configured.
  */
 export function isHindsightConfigured(): boolean {
-  return Boolean(HINDSIGHT_CONFIG.apiKey && HINDSIGHT_CONFIG.apiKey.trim().length > 0);
+  return Boolean(HINDSIGHT_CONFIG.apiKey && HINDSIGHT_CONFIG.apiKey.length > 0);
 }
