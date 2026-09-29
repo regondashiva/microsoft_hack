@@ -28,6 +28,10 @@ export function getAIClient(): OpenAI | null {
       baseURL: credentials.baseUrl,
       timeout: config.timeoutMs,
       maxRetries: 2,
+      defaultHeaders: {
+        "HTTP-Referer": "https://microsofthack.vercel.app",
+        "X-Title": "MemoryAI Content Strategist",
+      },
     });
     lastApiKey = credentials.apiKey;
     lastBaseUrl = credentials.baseUrl;
