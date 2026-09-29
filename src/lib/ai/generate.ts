@@ -65,17 +65,15 @@ export async function generateText(options: GenerateTextOptions): Promise<Genera
 
   // 4. Invoke LLM provider
   try {
-    const completion = await client.chat.completions.create(
-      {
-        model: config.model,
-        messages,
-        temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
-        max_tokens: options.maxTokens,
-      },
-      {
-        timeout: options.timeoutMs || config.timeoutMs,
-      }
-    );
+    console.log(`[AIService] Generating with model="${config.model}", baseUrl="${config.baseUrl || "https://api.openai.com/v1"}"`);
+    const completion = await client.chat.completions.create({
+      model: config.model,
+      messages,
+      temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
+      max_tokens: options.maxTokens,
+    }, {
+      timeout: options.timeoutMs || config.timeoutMs,
+    });
 
     const generatedText = completion.choices[0]?.message?.content || "";
     const resolvedModel = completion.model || config.model;

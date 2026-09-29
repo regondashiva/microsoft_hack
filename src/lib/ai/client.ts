@@ -5,13 +5,8 @@ if (typeof window !== "undefined") {
   throw new Error("CRITICAL SECURITY ERROR: AI client must only be instantiated server-side.");
 }
 
-let clientInstance: OpenAI | null = null;
-let lastApiKey = "";
-let lastBaseUrl: string | undefined = undefined;
-
 /**
- * Returns a singleton OpenAI client configured from server-side environment variables.
- * Automatically refreshes if environment credentials change.
+ * Returns a server-side OpenAI client configured dynamically from environment variables.
  */
 export function getAIClient(): OpenAI | null {
   const credentials = getAIServerCredentials();
@@ -21,21 +16,14 @@ export function getAIClient(): OpenAI | null {
 
   const config = getAIConfig();
 
-  // If credentials or baseUrl have changed, recreate the instance
-  if (!clientInstance || lastApiKey !== credentials.apiKey || lastBaseUrl !== credentials.baseUrl) {
-    clientInstance = new OpenAI({
-      apiKey: credentials.apiKey,
-      baseURL: credentials.baseUrl,
-      timeout: config.timeoutMs,
-      maxRetries: 2,
-      defaultHeaders: {
-        "HTTP-Referer": "https://microsofthack.vercel.app",
-        "X-Title": "MemoryAI Content Strategist",
-      },
-    });
-    lastApiKey = credentials.apiKey;
-    lastBaseUrl = credentials.baseUrl;
-  }
-
-  return clientInstance;
+  return new OpenAI({
+    apiKey: credentials.apiKey,
+    baseURL: credentials.baseUrl,
+    timeout: config.timeoutMs,
+    maxRetries: 2,
+    defaultHeaders: {
+      "HTTP-Referer": "https://microsofthack.vercel.app",
+      "X-Title": "MemoryAI Content Strategist",
+    },
+  });
 }
