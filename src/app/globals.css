@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-app: #f8fafc;
+    --surface: #ffffff;
+    --surface-elevated: #f1f5f9;
+    --surface-subtle: #f8fafc;
+
+    --border: #e2e8f0;
+    --border-subtle: #edf2f7;
+    --border-strong: #cbd5e1;
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-inverse: #ffffff;
+
+    --accent: #0f172a;
+    --accent-foreground: #ffffff;
+    --accent-subtle: #e2e8f0;
+    --accent-highlight: #3b82f6;
+
+    --status-success: #059669;
+    --status-success-bg: #ecfdf5;
+    --status-success-border: #a7f3d0;
+
+    --status-warning: #d97706;
+    --status-warning-bg: #fffbeb;
+    --status-warning-border: #fde68a;
+
+    --status-error: #dc2626;
+    --status-error-bg: #fef2f2;
+    --status-error-border: #fecaca;
+
+    --status-info: #0284c7;
+    --status-info-bg: #f0f9ff;
+    --status-info-border: #bae6fd;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-app: #09090b;
+      --surface: #111113;
+      --surface-elevated: #18181b;
+      --surface-subtle: #141416;
+
+      --border: #27272a;
+      --border-subtle: #1f1f23;
+      --border-strong: #3f3f46;
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #71717a;
+      --text-inverse: #09090b;
+
+      --accent: #f8fafc;
+      --accent-foreground: #09090b;
+      --accent-subtle: #27272a;
+      --accent-highlight: #60a5fa;
+
+      --status-success: #34d399;
+      --status-success-bg: #064e3b25;
+      --status-success-border: #065f46;
+
+      --status-warning: #fbbf24;
+      --status-warning-bg: #78350f25;
+      --status-warning-border: #92400e;
+
+      --status-error: #f87171;
+      --status-error-bg: #7f1d1d25;
+      --status-error-border: #991b1b;
+
+      --status-info: #38bdf8;
+      --status-info-bg: #0c4a6e25;
+      --status-info-border: #075985;
+    }
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom focus ring for accessible keyboard navigation */
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent-highlight);
+  outline-offset: 2px;
+}
