@@ -66,21 +66,25 @@ const CampaignContext = React.createContext<CampaignContextValue | undefined>(un
 const STORAGE_KEY = "memoryai_northstar_campaigns_v1";
 
 export function CampaignProvider({ children }: { children: React.ReactNode }) {
-  // Lazy initializer: hydrate from localStorage on first render (client-only)
-  const [campaigns, setCampaigns] = React.useState<Campaign[]>(() => {
-    if (typeof window === "undefined") return initialNorthstarCampaigns;
+  const [campaigns, setCampaigns] = React.useState<Campaign[]>(initialNorthstarCampaigns);
+  const [isLoaded, setIsLoaded] = React.useState(false);
+
+  // Load from localStorage only after client-side mount to prevent SSR hydration mismatch
+  React.useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as Campaign[];
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCampaigns(parsed);
+        }
       }
     } catch {
-      // Fall through to seeds
+      // Fallback gracefully
+    } finally {
+      setIsLoaded(true);
     }
-    return initialNorthstarCampaigns;
-  });
-  const isLoaded = true; // Hydration handled by lazy initializer
+  }, []);
 
   // Save changes to localStorage after initial hydration
   React.useEffect(() => {
