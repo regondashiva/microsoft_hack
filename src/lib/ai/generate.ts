@@ -66,17 +66,41 @@ export async function generateText(options: GenerateTextOptions): Promise<Genera
   // 4. Invoke LLM provider
   try {
     console.log(`[AIService] Generating with model="${config.model}", baseUrl="${config.baseUrl || "https://api.openai.com/v1"}"`);
-    const completion = await client.chat.completions.create({
-      model: config.model,
-      messages,
-      temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
-      max_tokens: options.maxTokens,
-    }, {
-      timeout: options.timeoutMs || config.timeoutMs,
-    });
+    let completion;
+    let resolvedModel = config.model;
+
+    try {
+      completion = await client.chat.completions.create({
+        model: config.model,
+        messages,
+        temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
+        max_tokens: options.maxTokens,
+      }, {
+        timeout: options.timeoutMs || config.timeoutMs,
+      });
+    } catch (primaryErr: unknown) {
+      const status = (primaryErr as { status?: number })?.status;
+      const errMsg = primaryErr instanceof Error ? primaryErr.message : "";
+      
+      // If primary model returned 404 (unavailable slug), fallback to openai/gpt-4o-mini
+      if ((status === 404 || errMsg.includes("404") || errMsg.includes("unavailable")) && config.model !== "openai/gpt-4o-mini") {
+        console.warn(`[AIService] Model "${config.model}" unavailable (${errMsg}). Falling back to "openai/gpt-4o-mini"...`);
+        resolvedModel = "openai/gpt-4o-mini";
+        completion = await client.chat.completions.create({
+          model: "openai/gpt-4o-mini",
+          messages,
+          temperature: typeof options.temperature === "number" ? options.temperature : 0.7,
+          max_tokens: options.maxTokens,
+        }, {
+          timeout: options.timeoutMs || config.timeoutMs,
+        });
+      } else {
+        throw primaryErr;
+      }
+    }
 
     const generatedText = completion.choices[0]?.message?.content || "";
-    const resolvedModel = completion.model || config.model;
+    resolvedModel = completion.model || resolvedModel;
 
     // Only include usage if actually returned by the provider
     let usage = undefined;

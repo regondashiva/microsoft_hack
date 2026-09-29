@@ -50,7 +50,7 @@ export function getAIConfig(): AIConfig {
 
   let model = cleanEnv(process.env.LLM_MODEL || process.env.DEFAULT_MODEL);
   if (isOpenRouter) {
-    if (!model || model === "gpt-4o-mini") {
+    if (!model || model === "gpt-4o-mini" || model.includes(":free") || model.includes("llama-3.3-70b")) {
       model = "openai/gpt-4o-mini";
     }
   } else {
