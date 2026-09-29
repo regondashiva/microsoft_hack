@@ -1,7 +1,7 @@
 # MemoryAI — AI Content Strategist
 
-> **Current Status: Task 6 — Teach → Remember → Recall → Improve Learning Loop (COMPLETE)**  
-> *Persistent learning loop allowing content strategists to teach preferences and rules, validate and deduplicate them, persist them in Hindsight, and recall them to guide improved future recommendations.*
+> **Current Status: Task 7 — Realistic Campaign & Performance Intelligence (COMPLETE)**  
+> *Structured campaign records, deterministic performance metrics, synthetic campaign intelligence, query-aware performance retrieval, and grounded AI strategist reasoning.*
 
 ---
 
@@ -28,11 +28,12 @@ The platform accumulates and maintains strategic brand context:
 - **Audience Understanding**: Segments, pain points, and format preferences.
 - **Campaign History**: Past, active, and upcoming campaign records with documented takeaways.
 - **Persistent Memory Layer**: Long-term organizational knowledge powered by Hindsight Cloud.
-- **AI Content Strategist**: Reasoning engine grounded in persistent brand memory.
+- **Campaign Intelligence Layer**: Structured campaign records, synthetic demonstration metrics, and deterministic performance observations.
+- **AI Content Strategist**: Reasoning engine grounded in persistent brand memory and campaign performance context.
 
 ---
 
-## 3. High-Level Architecture (Task 5 Pipeline)
+## 3. High-Level Architecture (Task 5 & Task 7 Pipeline)
 
 ```
                     Browser (Strategist Workspace)
@@ -44,19 +45,19 @@ The platform accumulates and maintains strategic brand context:
                         Strategist Service
                      (src/lib/strategist/)
                                 │
-          ┌─────────────────────┴─────────────────────┐
-          │ Step 1: RECALL                            │ Step 2: REASON
-          ▼                                           ▼
-   Hindsight Service                              AI Service
-  (src/lib/hindsight)                            (src/lib/ai)
-          │                                           │
-          ▼                                           ▼
-   Hindsight Cloud                                 LLM API
- (Vector + BM25 Recall)                         (OpenAI / Compatible)
-          │                                           │
-          ▼                                           ▼
- Persistent Memory Bank                         Zod Schema Validation
-(northstar-content-strategist)                 (Summary, Recs, Reason, Memory)
+          ┌─────────────────────┼─────────────────────┐
+          │ Step 1: RECALL      │ Step 2: CAMPAIGNS   │ Step 3: REASON
+          ▼                     ▼                     ▼
+   Hindsight Service     Campaign Layer          AI Service
+  (src/lib/hindsight)  (src/lib/campaigns)      (src/lib/ai)
+          │                     │                     │
+          ▼                     ▼                     ▼
+   Hindsight Cloud       Query Selection           LLM API
+ (Vector + BM25 Recall) (Filter & Disclaimers) (OpenAI / Compatible)
+          │                     │                     │
+          ▼                     ▼                     ▼
+ Persistent Memory Bank   <campaign_performance>  Zod Validation
+(northstar-content-...)   (Synthetic Demo Data) (Summary, Recs, Reason)
 ```
 
 The strategist coordinates **Query-Aware Retrieval and Bounded Reasoning**:
@@ -65,8 +66,9 @@ The strategist coordinates **Query-Aware Retrieval and Bounded Reasoning**:
 3. **Relevance Filtering & Deduplication**: Normalizes items, removes duplicates, and filters out contradictory channels/audiences.
 4. **Context Categorization**: Maps candidate memories into BRAND, AUDIENCE, CONTENT, CAMPAIGN, STRATEGIC categories.
 5. **Context Budgeting**: Enforces strict limit (`MAX_CONTEXT_MEMORIES = 6`), prioritizing memories based on query intent and authentic Hindsight scores.
-6. **Structured Prompt**: Delivers categorized XML blocks (`<brand_context>`, `<audience_context>`, etc.) to the LLM.
-7. **LLM Generation & Schema Validation**: Validates the output against the strict Zod schema; derives `memoryUsed` citations exclusively from selected memories.
+6. **Query-Aware Campaign Context**: Evaluates whether the query requires campaign performance context (e.g. LinkedIn vs Instagram performance, what worked, what to test next). Formats structured, disclaimed `<campaign_performance>` XML block. Excludes performance metrics from pure tone/voice or financial queries.
+7. **Structured Prompt**: Delivers categorized memory XML and synthetic campaign blocks to the LLM with strict anti-hallucination and data honesty rules.
+8. **LLM Generation & Schema Validation**: Validates the output against the strict Zod schema; derives citations exclusively from selected memories; ensures synthetic observations are never presented as verified business claims.
 
 ---
 
@@ -82,7 +84,7 @@ We are constructing **ONE production-level application incrementally** across di
 | **Task 4** | **Core AI Content Strategist Agent** | **COMPLETE** | Brand-grounded strategy formulation engine combining Hindsight memory recall with LLM reasoning, strict Zod output validation, prompt injection defense, and focused workspace UI. |
 | **Task 5** | **Hindsight Retrieval & Contextual Reasoning** | **COMPLETE** | Query-aware retrieval, deterministic relevance filtering, deduplication, strategic categorization, and bounded context budgeting. |
 | **Task 6** | **Teach → Remember → Recall → Improve Loop** | **COMPLETE** | Controlled persistent learning loop: explicit teaching, secret detection, deduplication, conflict preservation, and future strategy grounding. |
-| **Task 7** | **Realistic Brand, Campaign & Performance Data** | *Scheduled* | Realistic enterprise brand fixtures, multi-channel metrics, and authentic feedback seeds. |
+| **Task 7** | **Realistic Campaign & Performance Intelligence** | **COMPLETE** | Structured campaign model, synthetic demo dataset, deterministic metrics, channel filtering, campaign detail view, and query-aware strategist reasoning. |
 | **Task 8** | **Production UI & Complete User Workflows** | *Scheduled* | Full interactive strategy canvas, campaign formulation workflows, memory inspection drawer. |
 | **Task 9** | **Explainable Memory Recommendations & WOW Demo**| *Scheduled* | Visual memory recall attribution ("Why this was recommended"), before/after learning proof. |
 | **Task 10** | **Testing, Security, Deployment & Documentation** | *Scheduled* | Production hardening, security sanitization, automated test suite, Vercel/Azure deployment. |
@@ -194,19 +196,59 @@ $$\text{Teach} \longrightarrow \text{Validate} \longrightarrow \text{Retain} \lo
 
 ---
 
-## 8. Example Strategist Queries
+## 8. Task 7: Realistic Campaign & Performance Intelligence
 
-Use the interactive Strategist workspace (`/strategist`) to query:
-- *"What should Northstar post next?"*
-- *"How should we speak to young professionals?"*
-- *"What content themes fit our brand?"*
-- *"What should Northstar post on LinkedIn?"*
-- *"What should Northstar avoid in its messaging?"*
-- *"What campaigns has Northstar run?"*
+Task 7 introduces a structured campaign and performance intelligence layer designed to enable the strategist to reason about historical campaign outcomes without fabricating business metrics.
+
+### 1. Data Honesty & Synthetic Demonstration Framing
+- **Strict Honesty Rule**: All metric numbers (impressions, reach, engagements, clicks, conversions) are **synthetic demo records**. They are never claimed as actual business performance, revenue, or customer growth.
+- **Explicit Labeling**: Both the UI and LLM prompt explicitly label the records:
+  > *"Synthetic demo performance data — used to demonstrate campaign intelligence, not verified real-world business performance."*
+- **Separation of Concerns**: Structured campaign data lives in the dedicated campaign service (`src/lib/campaigns/`). It is **never automatically written into Hindsight** as permanent strategic memory unless explicitly taught by the user.
+
+### 2. Preserved Northstar Campaigns
+The synthetic dataset builds around Northstar's 4 authentic historical campaigns:
+1. **Productivity Without the Noise** (LinkedIn, Completed): Focuses on digital minimalism and focus. Higher engagement rate (4.79%) and CTR (2.27%) on multi-slide workflow checklists.
+2. **Work Smarter, Not Louder** (Instagram, Active): Actionable daily habits. Broad audience reach (26.5k accounts) via short-form video reels with moderate interaction (2.79% ER).
+3. **The Practical Tech Guide** (LinkedIn, Completed): Utility software and automation. Highest engagement rate (5.30%) and strongest CTR (2.64%) on step-by-step guides.
+4. **Behind the Workflow** (Instagram, Active): Desktop setups and user efficiency walkthroughs. Visual setup carousels drove higher engagement (3.90% ER) than short video reels.
+
+### 3. Deterministic Performance Calculations
+Derived metrics are calculated deterministically with safe division-by-zero guards:
+- **Engagement Rate**: $\text{ER} = (\text{engagements} / \text{reach}) \times 100$
+- **Click-Through Rate**: $\text{CTR} = (\text{clicks} / \text{impressions}) \times 100$
+- **Conversion Rate**: $\text{CR} = (\text{conversions} / \text{clicks}) \times 100$
+
+### 4. Query-Aware Campaign Context Retrieval
+Campaign performance is injected into the LLM prompt **only when relevant**:
+- **LinkedIn Queries** (e.g. *"What worked in our previous LinkedIn campaigns?"*): Retrieves exclusively LinkedIn campaigns.
+- **Instagram Queries** (e.g. *"What worked in our Instagram campaigns?"*): Retrieves exclusively Instagram campaigns.
+- **Testing & Next-Step Queries** (e.g. *"What should we test next based on previous campaigns?"*): Delivers cross-channel representative campaigns to ground recommendations.
+- **Tone & Voice Queries** (e.g. *"What tone should Northstar use?"*): Excludes campaign metrics so verified brand memory remains primary.
+- **Financial / Revenue Queries** (e.g. *"Give me a 2027 revenue forecast."*): Excludes campaign data and strictly refuses speculative claims.
+
+### 5. Dedicated API & Detail Experience
+- `GET /api/campaigns`: Filter by channel (`linkedin`, `instagram`) and status (`active`, `completed`).
+- `GET /api/campaigns/[id]`: Full breakdown of raw metrics, derived metrics, and qualitative signals.
+- `GET /api/campaigns/insights`: Deterministic observations comparing channels, themes, and formats.
+- `/campaigns`: Clean table overview with status/channel tabs and demo disclosure banner.
+- `/campaigns/[id]`: Deep-dive view showing campaign strategy and performance metrics.
 
 ---
 
-## 9. Verification & QA Commands
+## 9. Example Strategist Queries
+
+Use the interactive Strategist workspace (`/strategist`) to query:
+- *"What should Northstar post next?"*
+- *"What worked in our previous LinkedIn campaigns?"*
+- *"What worked in our Instagram campaigns?"*
+- *"What should we test next based on previous campaigns?"*
+- *"What tone should Northstar use?"*
+- *"Give me a 2027 revenue forecast."* (Demonstrates anti-hallucination refusal)
+
+---
+
+## 10. Verification & QA Commands
 
 ```bash
 # 1. Strict TypeScript Check

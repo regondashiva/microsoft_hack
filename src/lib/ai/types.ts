@@ -3,7 +3,7 @@
  * All types are server-safe and isolated from provider-specific dependencies.
  */
 
-export const MAX_PROMPT_LENGTH = 4000;
+export const MAX_PROMPT_LENGTH = 8000;
 
 export type AIProvider = "openai" | "openai-compatible" | "custom";
 

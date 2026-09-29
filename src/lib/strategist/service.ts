@@ -11,6 +11,7 @@ import {
 } from "./types";
 import { retrieveMemoriesForQuery } from "./retrieval";
 import { buildMemoryContext } from "./context";
+import { selectRelevantCampaignContext } from "../campaigns/selection";
 
 /**
  * Strips markdown code blocks if the model wrapped its response in ```json ... ```.
@@ -190,12 +191,15 @@ export async function formulateStrategy(query: string): Promise<FormulateStrateg
     (c) => context.categorized[c].length > 0
   );
 
+  // 6. Campaign context layer: Query-aware campaign performance retrieval
+  const campaignContextResult = selectRelevantCampaignContext(trimmedQuery, queryIntent);
+
   // Safe server-side debug observability (no API keys, no credentials, no prompts)
   console.log(
-    `[Strategist Service] Retrieval summary: retrieved=${retrievedMemories.length}, selected=${selectedMemories.length}, excluded=${totalExcludedCount}, categories=[${categoriesUsed.join(", ")}]`
+    `[Strategist Service] Context summary: memories=${selectedMemories.length}, excluded=${totalExcludedCount}, categories=[${categoriesUsed.join(", ")}], campaigns=${campaignContextResult.hasContext ? campaignContextResult.selectedCampaigns.length : 0}`
   );
 
-  // 6. Verify LLM service readiness
+  // 7. Verify LLM service readiness
   if (!isAIConfigured()) {
     console.error("[Strategist Service] AI service is unconfigured.");
     return {
@@ -207,9 +211,13 @@ export async function formulateStrategy(query: string): Promise<FormulateStrateg
     };
   }
 
-  // 7. Build structured prompt
+  // 8. Build structured prompt
   const systemPrompt = buildStrategistSystemPrompt();
-  const userPrompt = buildStrategistUserPrompt(trimmedQuery, context.formattedPromptContext);
+  const userPrompt = buildStrategistUserPrompt(
+    trimmedQuery,
+    context.formattedPromptContext,
+    campaignContextResult.hasContext ? campaignContextResult.formattedContext : undefined
+  );
 
   // 8. Invoke LLM generation
   let rawGeneration = "";
