@@ -12,6 +12,29 @@ function cleanEnv(val: string | undefined): string {
   return val.trim().replace(/^["']|["']$/g, "").trim();
 }
 
+function normalizeBaseUrl(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  let url = cleanEnv(raw).replace(/\/+$/, "");
+  if (!url) return undefined;
+
+  // Specific normalizer for OpenRouter endpoints
+  if (url.includes("openrouter.ai")) {
+    if (url.endsWith("/chat/completions")) {
+      url = url.slice(0, -"/chat/completions".length).replace(/\/+$/, "");
+    }
+    if (!url.endsWith("/v1")) {
+      if (url.endsWith("/api")) {
+        url = `${url}/v1`;
+      } else {
+        url = `${url}/api/v1`;
+      }
+    }
+    return url;
+  }
+
+  return url;
+}
+
 /**
  * Returns safe server-side AI configuration without exposing API keys.
  */
@@ -19,7 +42,7 @@ export function getAIConfig(): AIConfig {
   const apiKey = cleanEnv(process.env.LLM_API_KEY || process.env.OPENAI_API_KEY);
   const provider = (cleanEnv(process.env.LLM_PROVIDER) as AIProvider) || "openai-compatible";
   let model = cleanEnv(process.env.LLM_MODEL || process.env.DEFAULT_MODEL);
-  const baseUrl = cleanEnv(process.env.LLM_BASE_URL) || undefined;
+  const baseUrl = normalizeBaseUrl(process.env.LLM_BASE_URL);
 
   if (!model) {
     model = baseUrl && baseUrl.includes("openrouter.ai") ? "openai/gpt-4o-mini" : DEFAULT_MODEL;
@@ -43,7 +66,7 @@ export function getAIConfig(): AIConfig {
  */
 export function getAIServerCredentials(): { apiKey: string; baseUrl?: string } {
   const apiKey = cleanEnv(process.env.LLM_API_KEY || process.env.OPENAI_API_KEY);
-  const baseUrl = cleanEnv(process.env.LLM_BASE_URL) || undefined;
+  const baseUrl = normalizeBaseUrl(process.env.LLM_BASE_URL);
 
   return {
     apiKey,
